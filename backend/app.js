@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv/config');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 
 
 
@@ -26,6 +27,20 @@ app.post(`${api}/products`, (req, res) =>{
     console.log(newProduct);
     res.send(newProduct);
 }) 
+
+//connection BDD
+mongoose.connect(process.env.MONGO_CONNECTION, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: 'Fawzi'
+})
+.then(()=>{
+    console.log('connection Réussi');
+})
+.catch((err) => {
+    console.log(err);
+})
+
 app.listen(3000, ()=>{
     console.log('server de naruto http://localhost:3000');
 })
