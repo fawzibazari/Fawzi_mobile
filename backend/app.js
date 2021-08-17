@@ -23,14 +23,13 @@ const productSchema = mongoose.Schema ({
 
 const Product = mongoose.model('Product', productSchema)
 
-app.get(`${api}/products`, (req, res) =>{
-    const product = {
-        id: 1,
-        name: "hair dresser",
-        image: "https://upload.wikimedia.org/wikipedia/commons/4/48/Argentina_celebrando_copa_%28cropped%29.jpg"
-    }
+app.get(`${api}/products`, async (req, res) =>{
+    const productList = await Product.find();
 
-    res.send(product);
+    if(!productList) {
+        res.status(500).json({success: false})
+    }
+    res.send(productList);
 })
 
 app.post(`${api}/products`, (req, res) =>{
