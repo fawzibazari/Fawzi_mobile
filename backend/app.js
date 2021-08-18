@@ -6,50 +6,28 @@ const mongoose = require('mongoose');
 
 
 
-const api = process.env.API_URL
 
 //middleware NARUTO 
 app.use(express.json());
 app.use(morgan('tiny'));
 
-const productSchema = mongoose.Schema ({
-    name: String,
-    image: String,
-    countInStock: {
-        type: Number,
-        required: true
-    }
-})
+//les routes 
+const categoriesRoutes = require('./routers/categories');
+const productsRouter = require('./routers/products');
+const usersRouter = require('./routers/users');
+const ordersRouter = require('./routers/orders');
 
-const Product = mongoose.model('Product', productSchema)
 
-app.get(`${api}/products`, async (req, res) =>{
-    const productList = await Product.find();
+const api = process.env.API_URL
 
-    if(!productList) {
-        res.status(500).json({success: false})
-    }
-    res.send(productList);
-})
+app.use(`${api}/categories`, categoriesRoutes);
+app.use(`${api}/products`, productsRouter);
+app.use(`${api}/users`, usersRouter);
+app.use(`${api}/orders`, ordersRouter);
 
-app.post(`${api}/products`, (req, res) =>{
-    const product = new Product({
-        name: req.body.name,
-        image: req.body.image,
-        countInStock: req.body.countInStock,
 
-    });
+const Product = require('./models/product')
 
-    product.save().then((createdProduct => {
-        res.status(201).json(createdProduct)
-    })).catch((err)=>{
-        res.status(500).json({
-            error: err,
-            success: false
-        })
-
-    })
-}) 
 
 //connection BDD
 mongoose.connect(process.env.MONGO_CONNECTION, {
@@ -64,6 +42,7 @@ mongoose.connect(process.env.MONGO_CONNECTION, {
     console.log(err);
 })
 
+//serveur
 app.listen(3000, ()=>{
     console.log('server de naruto http://localhost:3000');
 })
