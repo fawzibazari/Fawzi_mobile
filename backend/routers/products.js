@@ -13,12 +13,12 @@ router.get(`/`, async (req, res) =>{  //mon get de tout les produit
 })
 
 router.get(`/:id`, async (req, res) =>{  //mon get pour un seul produit 
-    const productList = await Product.find();
+    const product = await Product.findById(req.params.id); // j'ai mis params parceque le parametre et dans l'url
 
-    if(!productList) {
+    if(!product) {
         res.status(500).json({success: false})
     } 
-    res.send(productList);
+    res.send(product);
 })
 
 router.post(`/`, async (req, res) =>{
