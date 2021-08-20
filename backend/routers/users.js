@@ -69,4 +69,27 @@ router.post('/login', async (req,res) => {
     return res.status(200).send(user);
 })
 
+
+router.post(`/register`, async (req, res) =>{
+    let user = new User({
+        name: req.body.name,
+        email: req.body.email,
+        passwordHash: bcrypt.hashSync(req.body.password, 10),
+        phone: req.body.phone,
+        isAdmin: req.body.isAdmin,
+        street: req.body.street,
+        apartment: req.body.apartment,
+        zip: req.body.zip,
+        city: req.body.city,
+        country: req.body.country,
+    })
+
+    user = await user.save();
+
+    if(!user)
+    return res.status(404).send('le user peut pas etre créer')
+
+    res.send(user);
+})
+
 module.exports =router;

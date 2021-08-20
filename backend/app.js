@@ -4,6 +4,8 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
+const authJwt = require('./helpers/jwt');
+const errorHandler = require('./helpers/error-handler');
 
 
 app.use(cors());
@@ -13,6 +15,8 @@ app.options('*', cors());
 //middleware NARUTO 
 app.use(express.json());
 app.use(morgan('tiny'));
+app.use(authJwt());
+app.use(errorHandler);
 
 //les routes 
 const categoriesRoutes = require('./routers/categories');
@@ -29,7 +33,7 @@ app.use(`${api}/users`, usersRouter);
 app.use(`${api}/orders`, ordersRouter);
 
 
-const Product = require('./models/product')
+const Product = require('./models/product');
 
 
 //connection BDD
