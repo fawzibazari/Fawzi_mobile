@@ -4,12 +4,23 @@ const { OrderItem } = require('../models/order-item');
 const router = express.Router();
 
 router.get(`/`, async (req, res) =>{
-    const orderList = await Order.find();
+    const orderList = await Order.find().populate('user', 'name').sort({'dateOrdered': -1});
 
     if(!orderList) {
         res.status(500).json({success: false})
     } 
     res.send(orderList);
+})
+
+router.get(`/:id`, async (req, res) =>{
+    const order = await Order.findById(req.params.id)
+    .populate('user', 'name')
+    .populate({ path: 'orderItems', populate:{ path: 'product' , populate: 'category'}});
+
+    if(!order) {
+        res.status(500).json({success: false})
+    } 
+    res.send(order);
 })
 
 router.post(`/`, async (req, res) =>{
@@ -41,7 +52,7 @@ router.post(`/`, async (req, res) =>{
         user: req.body.user,
     })
 
-    order = await order .save();
+    order = await order.save();
 
     if(!order)
     return res.status(404).send('la commande peut pas etre créer')
@@ -49,5 +60,32 @@ router.post(`/`, async (req, res) =>{
     res.send(order);
 })
 
+router.put(`/:id`, async (req, res) =>{
+    const order = await Order.findByIdAndUpdate(
+        req.params.id,
+        {
+            status: req.body.status
+        }, {new: true}
+    )
+    if(!order)
+    return res.status(404).send('pas possible de modifier la status de la commande')
 
+    res.send(order);
+})
+
+router.delete('/:id', (req, res) =>{ 
+    Order.findByIdAndRemove(req.params.id).then( async order =>{
+        if(order) {
+            await order.orderItems.map(async orderItem => {
+                await OrderItem.findByIdAndRemove(orderItem) 
+            })
+            return res.status(200).json({success: true, message: 'commande supprimmer'})
+        } else {
+            return res.status(404).json({success: false, message: 'commande pas trouver'})
+        }
+    }).catch(err=>{
+        return res.status(400).json({success: false, error: err})
+
+    })
+})
 module.exports =router;
