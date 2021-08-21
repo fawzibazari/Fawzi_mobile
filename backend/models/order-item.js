@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const orderItemSchema = mongoose.Schema({
     
-    quanity: {
+    quantity: {
         type: Number,
         required: true
     },
