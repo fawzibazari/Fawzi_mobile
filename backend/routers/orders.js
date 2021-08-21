@@ -37,6 +37,17 @@ router.post(`/`, async (req, res) =>{
 
     const orderItemsIdsResolved = await orderItemsIds;
 
+    const totalPrices = await Promise.all(orderItemsIdsResolved.map(async (orderItemId)=>{
+        const orderItem = await OrderItem.findById(orderItemId).populate('product', 'price');
+        const totalPrice = orderItem.product.price * orderItem.quantity;
+        return totalPrice
+    }))
+
+    console.log(totalPrices);
+
+    const totalPrice = totalPrices.reduce((a,b) => a +b , 0);
+
+
     // console.log(orderItemsIdsResolved);
 
     let order = new Order({
@@ -48,7 +59,7 @@ router.post(`/`, async (req, res) =>{
         country: req.body.country,
         phone: req.body.phone,
         status: req.body.status,
-        totalPrice: req.body.totalPrice,
+        totalPrice: totalPrice,
         user: req.body.user,
     })
 
@@ -87,5 +98,30 @@ router.delete('/:id', (req, res) =>{
         return res.status(400).json({success: false, error: err})
 
     })
+
+    
+})
+
+router.get('/get/totalsales', async (req, res)=> {
+    const totalSales= await Order.aggregate([
+        { $group: { _id: null , totalsales : { $sum : '$totalPrice'}}}
+    ])
+
+    if(!totalSales) {
+        return res.status(400).send('Le prix total peux pas etre afficher')
+    }
+
+    res.send({totalsales: totalSales.pop().totalsales})
+})
+
+router.get(`/get/count`, async (req, res) =>{
+    const orderCount = await Order.countDocuments((count) => count)
+
+    if(!orderCount) {
+        res.status(500).json({success: false})
+    } 
+    res.send({
+        orderCount: orderCount
+    });
 })
 module.exports =router;
