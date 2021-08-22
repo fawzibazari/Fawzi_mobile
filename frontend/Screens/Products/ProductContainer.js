@@ -26,9 +26,9 @@ const ProductContainer = () => {
 return (
     <View>
         <Text>Container des produits</Text>
-        <View style={{ marginTop: 100}}>
+        <View style={{ marginTop: 100,backgroundColor: 'gainsboro' }}>
         <FlatList
-        horizontal 
+        numColumns={2}
         data={products}
         renderItem={({item}) => <ProductList
          key={item.id}
