@@ -52,7 +52,7 @@ return (
        onFocus={openList}
        onChangeText={(text) => searchProduct(text)}
      />
-     {/* {focus == true ? <Icon onPress={onBlur} name="ios-close" /> : null} */}
+     {focus == true ? <Icon onPress={onBlur} name="ios-close" /> : null}
      {/* pas encore fini le back-end du coup je enleve mon focus */}
    </Item>
         </Header>
